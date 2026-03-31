@@ -1,10 +1,10 @@
 import {
   FeildsArr,
   HeaderSubFeilds,
-  type FieldsWithSubfeilds,
+  type FieldWithSubFields,
 } from "../types.js";
 
-export function getSubfeilds(feild: FieldsWithSubfeilds) {
+export function getSubfeilds(feild: FieldWithSubFields) {
   switch (feild) {
     case "Header":
       return ["Name", "Phone", "Email"];
@@ -18,3 +18,6 @@ export function getSubfeilds(feild: FieldsWithSubfeilds) {
 export function getFeilds() {
   return FeildsArr;
 }
+
+export * from "./reply.helper.js";
+export * from "./feildType.helper.js";

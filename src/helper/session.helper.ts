@@ -1,11 +1,11 @@
-import type { MyContext, SessionData } from "../types.js";
+import type { LeafField, MyContext, SessionData } from "../types.js";
 
 export class SessionHelper {
   initialize(): SessionData {
     return {
       mode: null,
       step: null,
-      subFeild: null,
+      leafField: null,
     };
   }
   updateSessionMode(ctx: MyContext, mode: SessionData["mode"]) {
@@ -14,8 +14,8 @@ export class SessionHelper {
   updateSessionStep(ctx: MyContext, step: SessionData["step"]) {
     ctx.session.step = step;
   }
-  updateSessionFeild(ctx: MyContext, feild: SessionData["subFeild"]) {
-    ctx.session.subFeild = feild;
+  updateSessionFeild(ctx: MyContext, feild: LeafField) {
+    ctx.session.leafField = feild;
   }
 }
 

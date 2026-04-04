@@ -18,8 +18,7 @@ logs/
 
 ./src/generated/prisma
 
-./generated/**/*
-
+generated/
 
 
 

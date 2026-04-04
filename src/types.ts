@@ -1,6 +1,23 @@
 import { Conversation, type ConversationFlavor } from "@grammyjs/conversations";
 import type { Context, SessionFlavor } from "grammy";
 import { z } from "zod";
+import {
+  AwardSchema,
+  CertificationSchema,
+  EducationSchema,
+  ExperienceSchema,
+  HeaderSchema,
+  LinksSchema,
+  ProjectSchema,
+  SkillsSchema,
+} from "../generated/zod";
+import type {
+  Award,
+  Certification,
+  Education,
+  Experience,
+  Project,
+} from "./prisma/client";
 
 export const Fields = z.enum([
   "Header",
@@ -57,14 +74,33 @@ export const MultiStringLeafFieldArr = [
   "Awards",
 ] as const;
 export type MultiStringLeafFieldArr = (typeof MultiStringLeafFieldArr)[number];
+export type SingleStringLeafField = Exclude<LeafField, MultiStringLeafFieldArr>;
 
 export const SessionData = z.object({
+  telegramId: z.string().nullable(),
   mode: z.enum(["Add", "Edit", "Delete"]).nullable(),
   step: z.enum(["feild", "subfeild", "value"]).nullable(),
   leafField: z
     .union([HeaderSubFeilds, LinksSubfeild, SkillsSubFeilds, LeafFieldInFields])
     .nullable(),
+  selectedIndex: z.number().nullable(),
 });
+
+export const ResumeSchema = z.object({
+  id: z.string(),
+  header: HeaderSchema.optional(),
+  links: LinksSchema.optional(),
+  skills: SkillsSchema.optional(),
+  summary: z.string().optional(),
+  experience: z.array(ExperienceSchema),
+  projects: z.array(ProjectSchema),
+  education: z.array(EducationSchema),
+  certification: z.array(CertificationSchema),
+  awards: z.array(AwardSchema),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+export type Resume = z.infer<typeof ResumeSchema>;
 
 export type SessionData = z.infer<typeof SessionData>;
 
@@ -72,3 +108,53 @@ export type MyContext = ConversationFlavor<
   Context & SessionFlavor<SessionData>
 >;
 export type MyConversation = Conversation<MyContext, Context>;
+
+// Discriminated union schema — fieldName is the discriminator
+export const InsertPayloadSchema = z.discriminatedUnion("fieldName", [
+  z.object({ fieldName: z.literal("Experience"), data: ExperienceSchema }),
+  z.object({ fieldName: z.literal("Projects"), data: ProjectSchema }),
+  z.object({ fieldName: z.literal("Education"), data: EducationSchema }),
+  z.object({
+    fieldName: z.literal("Certification"),
+    data: CertificationSchema,
+  }),
+  z.object({ fieldName: z.literal("Awards"), data: AwardSchema }),
+]);
+
+export type InsertPayload = z.infer<typeof InsertPayloadSchema>;
+
+export const SingleStringSchema = z.object({ input: z.string().min(1) });
+export type SingleString = z.infer<typeof SingleStringSchema>;
+
+// helper — maps any leaf field to its dot path
+export const FIELD_PATH_MAP: Record<SingleStringLeafField, string> = {
+  // Header subfields
+  Name: "header.name",
+  Phone: "header.phone",
+  Email: "header.email",
+  // Links subfields
+  Github: "links.github",
+  Linkedin: "links.linkedin",
+  X: "links.x",
+  // Skills subfields
+  Technical: "skills.technical",
+  Soft: "skills.soft",
+  Tools: "skills.tools",
+  // Top level
+  Summary: "summary",
+};
+
+export type FieldData =
+  | Project[]
+  | Certification[]
+  | Experience[]
+  | Education[]
+  | Award[];
+
+export type FieldReturnTypeMap = {
+  Experience: Experience[];
+  Projects: Project[];
+  Education: Education[];
+  Certification: Certification[];
+  Awards: Award[];
+};

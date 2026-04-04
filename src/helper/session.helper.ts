@@ -1,11 +1,13 @@
-import type { LeafField, MyContext, SessionData } from "../types.js";
+import type { LeafField, MyContext, SessionData } from "../types";
 
 export class SessionHelper {
   initialize(): SessionData {
     return {
+      telegramId: "",
       mode: null,
       step: null,
       leafField: null,
+      selectedIndex: null,
     };
   }
   updateSessionMode(ctx: MyContext, mode: SessionData["mode"]) {

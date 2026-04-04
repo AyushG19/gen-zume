@@ -22,3 +22,11 @@ export function getSubFeildsKeyboard(
   });
   return kb;
 }
+
+export function getOptionKeyboard(n: number) {
+  const kb = new InlineKeyboard();
+  for (let i = 1; i <= n; i++) {
+    kb.text(i.toString());
+  }
+  return kb;
+}

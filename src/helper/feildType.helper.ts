@@ -22,3 +22,8 @@ export function isMultiStringLeafField(
 ): field is MultiStringLeafFieldArr {
   return MultiStringLeafFieldArr.includes(field as any);
 }
+
+export function isIndex(data: unknown): boolean {
+  if (typeof data !== "string" || data.trim() === "") return false;
+  return Number.isInteger(Number(data));
+}

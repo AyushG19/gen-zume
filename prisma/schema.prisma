@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+generator zod {
+  provider = "zod-prisma-types"
+  output   = "../generated/zod" // This will output all zod schemas neatly into this folder
+  createModelTypes = true
+}
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type Header {
+name  String?
+phone String?
+email String?
+}
+
+type Links {
+github   String?
+linkedin String?
+x        String?
+}
+
+type Skills {
+technical String?
+soft      String?
+tools     String?
+}
+
+type Experience {
+jobTitle    String
+companyName String
+startDate   String
+endDate     String
+description String
+}
+
+type Project {
+projectName  String
+technologies String
+bulletPoints String[]
+}
+
+type Education {
+qualification String
+institution   String
+startYear     String
+endYear       String
+}
+
+type Certification {
+certificationName String
+acronym           String?
+organizationName  String
+dateEarned        String
+credentialId      String?
+}
+
+type Award {
+awardName String
+issuer    String
+date      String
+}
+
+model Resume {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId    String   @unique
+  header        Header?
+  links         Links?
+  skills        Skills?
+  summary       String?
+  experience    Experience[]
+  projects      Project[]
+  education     Education[]
+  certification Certification[]
+  awards        Award[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

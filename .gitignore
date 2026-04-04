@@ -15,14 +15,11 @@ logs/
 .idea/
 *.suo
 *.user
-/src/generated/prisma
 
-/generated/prisma
+./src/generated/prisma
 
-/generated/prisma
+./generated/**/*
 
-/generated/prisma
 
-/generated/prisma
 
-/generated/prisma
+

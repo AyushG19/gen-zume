@@ -1,5 +1,5 @@
-import { getBlueprint } from "./blueprints";
-import { runBlueprint } from "./runner";
+import { getBlueprint } from "./blueprints.js";
+import { runBlueprint } from "./runner.js";
 import {
   deleteMultiStrLeafFieldData,
   deleteSingleStrLeafFieldData,
@@ -16,10 +16,11 @@ import {
   SingleStringSchema,
 } from "../types.js";
 import type { CallbackQueryContext, Context } from "grammy";
-import { isMultiStringLeafField } from "../helper";
-
-import { showEditableFields } from "../helper/fieldDisplay.helper";
-import { getFieldPath } from "../helper/fieldPath.helper";
+import {
+  isMultiStringLeafField,
+  showEditableFields,
+  getFieldPath,
+} from "../helper/index.js";
 
 export async function MasterConvo(
   conversation: MyConversation,

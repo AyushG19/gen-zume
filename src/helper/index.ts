@@ -1,8 +1,4 @@
-import {
-  FeildsArr,
-  HeaderSubFeilds,
-  type FieldWithSubFields,
-} from "../types.js";
+import { FeildsArr, type FieldWithSubFields } from "../types.js";
 
 export function getSubfeilds(feild: FieldWithSubFields) {
   switch (feild) {
@@ -21,3 +17,6 @@ export function getFeilds() {
 
 export * from "./reply.helper.js";
 export * from "./feildType.helper.js";
+export * from "./fieldDisplay.helper.js";
+export * from "./fieldPath.helper.js";
+export * from "./session.helper.js";

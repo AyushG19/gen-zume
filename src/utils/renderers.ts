@@ -21,7 +21,7 @@ const PUPPETEER_HEADER = (left: string, right: string) => `
 
 // ── PROJECTS ──────────────────────────────────────────────────────────────────
 
-export function projectsToTelegramHtml(projects: Project[]): string {
+export function projectsToTelegramHtml_outdated(projects: Project[]): string {
   if (projects.length === 0)
     return "📂 No projects found. Use /add to add one.";
   let str = "<b>🚀 Your Projects</b>\n<i>Reply with a number to select</i>\n\n";
@@ -53,7 +53,9 @@ export function projectToPuppeteerHtml(project: Project): string {
 
 // ── EXPERIENCE ────────────────────────────────────────────────────────────────
 
-export function experienceToTelegramHtml(experiences: Experience[]): string {
+export function experienceToTelegramHtml_outdated(
+  experiences: Experience[],
+): string {
   if (experiences.length === 0)
     return "💼 No experience found. Use /add to add one.";
   let str =
@@ -81,7 +83,9 @@ export function experienceToPuppeteerHtml(exp: Experience): string {
 
 // ── EDUCATION ─────────────────────────────────────────────────────────────────
 
-export function educationToTelegramHtml(educations: Education[]): string {
+export function educationToTelegramHtml_outdated(
+  educations: Education[],
+): string {
   if (educations.length === 0)
     return "🎓 No education found. Use /add to add one.";
   let str =
@@ -108,7 +112,9 @@ export function educationToPuppeteerHtml(edu: Education): string {
 
 // ── CERTIFICATION ─────────────────────────────────────────────────────────────
 
-export function certificationsToTelegramHtml(certs: Certification[]): string {
+export function certificationsToTelegramHtml_outdated(
+  certs: Certification[],
+): string {
   if (certs.length === 0)
     return "📜 No certifications found. Use /add to add one.";
   let str =
@@ -142,7 +148,7 @@ export function certificationToPuppeteerHtml(cert: Certification): string {
 
 // ── AWARDS ────────────────────────────────────────────────────────────────────
 
-export function awardsToTelegramHtml(awards: Award[]): string {
+export function awardsToTelegramHtml_outdated(awards: Award[]): string {
   if (awards.length === 0) return "🏆 No awards found. Use /add to add one.";
   let str = "<b>🏆 Your Awards</b>\n<i>Reply with a number to select</i>\n\n";
   awards.forEach((a, i) => {

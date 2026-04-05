@@ -1,15 +1,14 @@
 import type { Context } from "grammy";
-import type { MultiStringLeafFieldArr } from "../types";
+import type { MultiStringLeafFieldArr, FieldData } from "../types.js";
 import {
   awardsToTelegramHtml,
   certificationsToTelegramHtml,
   educationToTelegramHtml,
   experienceToTelegramHtml,
   projectsToTelegramHtml,
-} from "../utils/toHtml";
-import { getOptionKeyboard } from "../utils/keyboars";
-import { type FieldData } from "../types";
-import { getMultiStrLeafFieldData } from "../../prisma/index";
+  getOptionKeyboard,
+} from "../utils/index.js";
+import { getMultiStrLeafFieldData } from "../../prisma/index.js";
 
 const call = (ctx: Context, teleReply: string, index: number) => {
   ctx.reply(`${teleReply}`, {

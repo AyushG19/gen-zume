@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Bot, session } from "grammy";
+import { Bot, session, webhookCallback } from "grammy";
 import {
   type ConversationFlavor,
   conversations,
@@ -7,8 +7,7 @@ import {
 } from "@grammyjs/conversations";
 
 import { getFeildsKeyboard, getSubFeildsKeyboard } from "./utils/keyboars.js";
-import { type MyContext } from "./types.js";
-import { SessionHelper } from "./helper/session.helper.js";
+import { SessionData, type MyContext } from "./types.js";
 
 import {
   isFieldLeafField,
@@ -17,13 +16,23 @@ import {
   isMultiStringLeafField,
 } from "./helper/feildType.helper.js";
 import { DeleteConvo, MasterConvo } from "./conversations/master.js";
+import { getOrCreateResume } from "../prisma/index.js";
+import { createServer } from "http";
 
-const bot = new Bot<ConversationFlavor<MyContext>>(
-  process.env.TELEGRAM_BOT_KEY!,
-); //change in futurte
-const sessionHelper = new SessionHelper();
+const token = process.env.TELEGRAM_BOT_KEY;
+export const bot = new Bot<ConversationFlavor<MyContext>>(token!); //change in futurte
 
-bot.use(session({ initial: () => sessionHelper.initialize() }));
+bot.use(
+  session({
+    initial: (): SessionData => ({
+      telegramId: null,
+      leafField: null,
+      mode: null,
+      selectedIndex: null,
+      step: null,
+    }),
+  }),
+);
 
 bot.use(conversations());
 
@@ -53,7 +62,14 @@ bot.use(createConversation(DeleteConvo, "DeleteConvo"));
 
 bot.on("message::bot_command", (ctx) => {
   const text = ctx.message.text;
-  if (text === "/add") {
+
+  if (text === "/start") {
+    const start = async () => {
+      const res = await getOrCreateResume(ctx.session.telegramId!);
+      console.log(res);
+    };
+    start();
+  } else if (text === "/add") {
     // sessionHelper.updateSessionMode(ctx, "Add");
     ctx.session.mode = "Add";
     ctx.reply("📝  <b>Add Resume Section</b>\nChoose what you want to add:", {
@@ -127,5 +143,34 @@ bot.on("message:text", async (ctx) => {
   }
 });
 bot.catch((error) => console.log(error));
-bot.start();
-console.log("BOT Running...");
+
+const isDev = process.env.NODE_ENV !== "production";
+
+if (isDev) {
+  bot.api.deleteWebhook().then(() => {
+    bot.start();
+    console.log("Bot running in Long polling mode...");
+  });
+} else {
+  const handleUpdates = webhookCallback(bot, "http");
+
+  const server = createServer((req, res) => {
+    if (req.url === "/health" && req.method === "GET") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ status: "ok", uptime: process.uptime() }));
+      return;
+    } else if (req.url === `/${token}` && req.method === "POST") {
+      handleUpdates(req, res);
+    }
+    res.writeHead(404);
+    res.end("Not found");
+  });
+
+  const port = process.env.PORT || 3000;
+  const domain = process.env.DOMAIN;
+  server.listen(port, async () => {
+    console.log(`Server listening to port ${port}`);
+    await bot.api.setWebhook(`${domain}/${token}`);
+    console.log(`Webhook set`);
+  });
+}

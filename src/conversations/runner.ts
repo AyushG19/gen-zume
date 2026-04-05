@@ -1,18 +1,6 @@
 import type { Context } from "grammy";
-import type {
-  MyConversation,
-  MyContext,
-  SingleString,
-  InsertPayload,
-} from "../types.js";
+import type { MyConversation } from "../types.js";
 import type { Blueprint } from "./blueprints.js";
-import type {
-  Certification,
-  Education,
-  Experience,
-  Project,
-} from "../prisma/client.js";
-import { record } from "zod";
 
 export async function runBlueprint(
   conversation: MyConversation,

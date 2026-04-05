@@ -5,25 +5,9 @@ import {
   getCertificationStrings,
   getSingleStringStrings,
   getAwardStrings,
-} from "./strings/index";
-import {
-  ProjectSchema,
-  ExperienceSchema,
-  EducationSchema,
-  CertificationSchema,
-  type Project,
-  type Experience,
-  type Education,
-  type Certification,
-} from "../../generated/zod/index.js";
-import type { ZodSchema } from "zod";
-import {
-  SingleStringSchema,
-  type LeafField,
-  type MultiStringLeafFieldArr,
-  type SingleString,
-} from "../types";
-import { isFieldLeafField, isMultiStringLeafField } from "../helper";
+} from "./strings/index.js";
+import { type LeafField } from "../types.js";
+import { isMultiStringLeafField } from "../helper/index.js";
 
 type Mode = "Add" | "Edit";
 export type Step = {

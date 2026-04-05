@@ -1,5 +1,4 @@
-import { prisma } from "../lib/prisma";
-import type { Fields, SingleStringLeafField } from "../types";
+import { prisma } from "../lib/prisma.js";
 
 export async function upsertIntoSinglStrLeafField(
   telegramId: string,
@@ -12,10 +11,10 @@ export async function upsertIntoSinglStrLeafField(
       {
         q: { telegramId },
         u: {
-          $set: { [fieldName]: data, updatedAt: new Date().toISOString() },
+          $set: { [fieldName]: data, updatedAt: new Date() },
           $setOnInsert: {
             telegramId,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date(),
           },
         },
 
@@ -35,7 +34,7 @@ export async function deleteSingleStrLeafFieldData(
     updates: [
       {
         q: { telegramId },
-        u: { $unset: { [fieldPath]: "" }, updatedAt: new Date().toISOString() },
+        u: { $unset: { [fieldPath]: "" }, updatedAt: new Date() },
       },
     ],
   });

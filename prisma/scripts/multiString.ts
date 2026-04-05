@@ -1,10 +1,10 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 import {
   type FieldData,
   type FieldReturnTypeMap,
   type InsertPayload,
-} from "../../src/types";
-import { type InputJsonValue } from "../../generated/prisma/internal/prismaNamespace";
+} from "../../src/types.js";
+import { type InputJsonValue } from "@prisma/client/runtime/library.js";
 
 export async function insertIntoMultiStrLeafField(
   telegramId: string,
@@ -18,8 +18,6 @@ export async function insertIntoMultiStrLeafField(
         create: {
           telegramId,
           experience: payload.data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         },
       });
       return res.experience ?? null;
@@ -31,8 +29,6 @@ export async function insertIntoMultiStrLeafField(
         create: {
           telegramId,
           projects: payload.data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         },
       });
       return res.projects ?? null;
@@ -44,8 +40,6 @@ export async function insertIntoMultiStrLeafField(
         create: {
           telegramId,
           education: payload.data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         },
       });
       return res.education ?? null;
@@ -57,8 +51,6 @@ export async function insertIntoMultiStrLeafField(
         create: {
           telegramId,
           certification: payload.data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         },
       });
       return res.certification ?? null;
@@ -70,8 +62,6 @@ export async function insertIntoMultiStrLeafField(
         create: {
           telegramId,
           awards: payload.data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         },
       });
       return res.awards ?? null;
@@ -110,7 +100,7 @@ export async function updateIntoMultiStrLeafField(
         u: {
           $set: {
             [`${dbFieldName}.${index}`]: payload.data,
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date(),
           },
         },
       },
@@ -134,7 +124,7 @@ export async function deleteMultiStrLeafFieldData(
           $pull: {
             [firstFieldName]: [firstFieldValue],
             $set: {
-              updatedAt: new Date().toISOString(),
+              updatedAt: new Date(),
             },
           },
         },

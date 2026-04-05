@@ -1,4 +1,4 @@
-import type { LeafField, MyContext, SessionData } from "../types";
+import type { LeafField, MyContext, SessionData } from "../types.js";
 
 export class SessionHelper {
   initialize(): SessionData {

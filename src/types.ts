@@ -10,14 +10,14 @@ import {
   LinksSchema,
   ProjectSchema,
   SkillsSchema,
-} from "../generated/zod";
+} from "../generated/zod/index.js";
 import type {
   Award,
   Certification,
   Education,
   Experience,
   Project,
-} from "./prisma/client";
+} from "@prisma/client";
 
 export const Fields = z.enum([
   "Header",

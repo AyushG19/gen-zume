@@ -1,9 +1,8 @@
+import type { FieldWithSubFields, LeafField } from "../types.js";
 import {
   FieldWithSubFieldsArr,
-  LeafField,
   LeafFieldArr,
   MultiStringLeafFieldArr,
-  type FieldWithSubFields,
 } from "../types.js";
 
 export function isFieldWithSubfields(

@@ -6,7 +6,11 @@ import {
   createConversation,
 } from "@grammyjs/conversations";
 
-import { getFeildsKeyboard, getSubFeildsKeyboard } from "./utils/keyboars.js";
+import {
+  getFeildsKeyboard,
+  getSubFeildsKeyboard,
+  isConvoActive,
+} from "./utils/index.js";
 import { SessionData, type MyContext } from "./types.js";
 
 import {
@@ -14,7 +18,8 @@ import {
   isFieldWithSubfields,
   isIndex,
   isMultiStringLeafField,
-} from "./helper/feildType.helper.js";
+  getResetSession,
+} from "./helper/index.js";
 import { DeleteConvo, MasterConvo } from "./conversations/master.js";
 import { getOrCreateResume } from "../prisma/index.js";
 import { createServer } from "http";
@@ -60,33 +65,36 @@ bot.hears(/^(exit|cancel|quit)$/i, async (ctx) => {
 bot.use(createConversation(MasterConvo, "MasterConvo"));
 bot.use(createConversation(DeleteConvo, "DeleteConvo"));
 
-bot.on("message::bot_command", (ctx) => {
+bot.on("message::bot_command", async (ctx) => {
   const text = ctx.message.text;
-
+  if (isConvoActive(ctx)) {
+    await ctx.reply("Wait a req is already processing...");
+    return;
+  }
   if (text === "/start") {
-    const start = async () => {
-      const res = await getOrCreateResume(ctx.session.telegramId!);
-      console.log(res);
-    };
-    start();
+    const res = await getOrCreateResume(ctx.session.telegramId!);
+    console.log(res);
   } else if (text === "/add") {
-    // sessionHelper.updateSessionMode(ctx, "Add");
     ctx.session.mode = "Add";
-    ctx.reply("📝  <b>Add Resume Section</b>\nChoose what you want to add:", {
-      reply_markup: getFeildsKeyboard(),
-      parse_mode: "HTML",
-    });
+    await ctx.reply(
+      "📝  <b>Add Resume Section</b>\nChoose what you want to add:",
+      {
+        reply_markup: getFeildsKeyboard(),
+        parse_mode: "HTML",
+      },
+    );
   } else if (text === "/edit") {
-    // sessionHelper.updateSessionMode(ctx, "Edit");
     ctx.session.mode = "Edit";
-    ctx.reply("✏️ <b>Edit Resume Section</b>\nChoose what you want to edit:", {
-      reply_markup: getFeildsKeyboard(),
-      parse_mode: "HTML",
-    });
+    await ctx.reply(
+      "✏️ <b>Edit Resume Section</b>\nChoose what you want to edit:",
+      {
+        reply_markup: getFeildsKeyboard(),
+        parse_mode: "HTML",
+      },
+    );
   } else if (text === "/delete") {
     ctx.session.mode = "Delete";
-    // sessionHelper.updateSessionMode(ctx, "Delete");
-    ctx.reply(
+    await ctx.reply(
       "🗑️ <b>Delete Resume Section</b>\nChoose what you want to delete:",
       { reply_markup: getFeildsKeyboard(), parse_mode: "HTML" },
     );
@@ -98,7 +106,6 @@ bot.on("callback_query", async (ctx) => {
   console.log(ctx.session);
   const data = ctx.callbackQuery.data;
   const { mode } = ctx.session;
-  await ctx.answerCallbackQuery();
 
   if (!data || !mode) {
     console.log("no data");
@@ -107,6 +114,9 @@ bot.on("callback_query", async (ctx) => {
 
   //-1 if user choses fields with sub fielsds
   if (isFieldWithSubfields(data)) {
+    if (ctx.session.step === "subfeild") {
+      return;
+    }
     ctx.session.step = "subfeild";
     ctx.reply(`🔍 <b>Select one to ${ctx.session.mode}:</b>`, {
       reply_markup: getSubFeildsKeyboard(data),
@@ -124,11 +134,18 @@ bot.on("callback_query", async (ctx) => {
 
   if (isFieldLeafField(data)) {
     ctx.session.leafField = data;
-    if (ctx.session.mode === "Delete") {
-      await ctx.conversation.enter("DeleteConvo");
+    ctx.session.step = "value";
+    if (isConvoActive(ctx)) {
+      await ctx.reply("Processing something else..");
       return;
     }
-    await ctx.conversation.enter("MasterConvo", ctx.session.mode);
+
+    await ctx.conversation.enter(
+      mode === "Delete" ? "DeleteConvo" : "MasterConvo",
+      mode,
+    );
+
+    ctx.session = getResetSession();
   }
 });
 
@@ -142,7 +159,9 @@ bot.on("message:text", async (ctx) => {
     // );
   }
 });
-bot.catch((error) => console.log(error));
+bot.catch((error) => {
+  console.log(error);
+});
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -152,7 +171,7 @@ if (isDev) {
     console.log("Bot running in Long polling mode...");
   });
 } else {
-  const handleUpdates = webhookCallback(bot, "http");
+  const handleUpdates = webhookCallback(bot, "http", { onTimeout: "return" });
 
   const server = createServer((req, res) => {
     if (req.url === "/health" && req.method === "GET") {
@@ -161,6 +180,7 @@ if (isDev) {
       return;
     } else if (req.url === `/${token}` && req.method === "POST") {
       handleUpdates(req, res);
+      return;
     }
     res.writeHead(404);
     res.end("Not found");

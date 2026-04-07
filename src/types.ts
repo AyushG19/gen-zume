@@ -1,6 +1,14 @@
-import { Conversation, type ConversationFlavor } from "@grammyjs/conversations";
+import type { Conversation, ConversationFlavor } from "@grammyjs/conversations";
+import type {
+  Award,
+  Certification,
+  Education,
+  Experience,
+  Project,
+} from "@prisma/client";
 import type { Context, SessionFlavor } from "grammy";
 import { z } from "zod";
+
 import {
   AwardSchema,
   CertificationSchema,
@@ -11,14 +19,6 @@ import {
   ProjectSchema,
   SkillsSchema,
 } from "../generated/zod/index.js";
-import type {
-  Award,
-  Certification,
-  Education,
-  Experience,
-  Project,
-} from "@prisma/client";
-
 export const Fields = z.enum([
   "Header",
   "Links",
@@ -109,7 +109,6 @@ export type MyContext = ConversationFlavor<
 >;
 export type MyConversation = Conversation<MyContext, Context>;
 
-// Discriminated union schema — fieldName is the discriminator
 export const InsertPayloadSchema = z.discriminatedUnion("fieldName", [
   z.object({ fieldName: z.literal("Experience"), data: ExperienceSchema }),
   z.object({ fieldName: z.literal("Projects"), data: ProjectSchema }),
@@ -126,21 +125,16 @@ export type InsertPayload = z.infer<typeof InsertPayloadSchema>;
 export const SingleStringSchema = z.object({ input: z.string().min(1) });
 export type SingleString = z.infer<typeof SingleStringSchema>;
 
-// helper — maps any leaf field to its dot path
 export const FIELD_PATH_MAP: Record<SingleStringLeafField, string> = {
-  // Header subfields
   Name: "header.name",
   Phone: "header.phone",
   Email: "header.email",
-  // Links subfields
   Github: "links.github",
   Linkedin: "links.linkedin",
   X: "links.x",
-  // Skills subfields
   Technical: "skills.technical",
   Soft: "skills.soft",
   Tools: "skills.tools",
-  // Top level
   Summary: "summary",
 };
 

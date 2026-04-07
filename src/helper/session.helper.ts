@@ -1,24 +1,11 @@
-import type { LeafField, MyContext, SessionData } from "../types.js";
+import type { MyContext, SessionData } from "../types";
 
-export class SessionHelper {
-  initialize(): SessionData {
-    return {
-      telegramId: "",
-      mode: null,
-      step: null,
-      leafField: null,
-      selectedIndex: null,
-    };
-  }
-  updateSessionMode(ctx: MyContext, mode: SessionData["mode"]) {
-    ctx.session.mode = mode;
-  }
-  updateSessionStep(ctx: MyContext, step: SessionData["step"]) {
-    ctx.session.step = step;
-  }
-  updateSessionFeild(ctx: MyContext, feild: LeafField) {
-    ctx.session.leafField = feild;
-  }
+export function getResetSession(): SessionData {
+  return {
+    leafField: null,
+    mode: null,
+    selectedIndex: null,
+    step: null,
+    telegramId: null,
+  };
 }
-
-export type SessionHelperType = SessionHelper;

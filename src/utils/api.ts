@@ -1,6 +1,6 @@
 import type { Resume } from "@prisma/client";
-import { normalizeResume } from "../helper/resume.helper";
-import { generateResumeTex } from "./toTex";
+import { normalizeResume } from "../helper/resume.helper.js";
+import { generateResumeTex } from "./toTex.js";
 
 export type ApiResponse = {
   status: "success" | "error";

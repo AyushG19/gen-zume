@@ -7,5 +7,7 @@ export function getResetSession(): SessionData {
     selectedIndex: null,
     step: null,
     telegramId: null,
+    _loading: false,
+    lastPdf: null,
   };
 }

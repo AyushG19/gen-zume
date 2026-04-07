@@ -20,3 +20,4 @@ export * from "./feildType.helper.js";
 export * from "./fieldDisplay.helper.js";
 export * from "./fieldPath.helper.js";
 export * from "./session.helper.js";
+export * from "./resume.helper.js";

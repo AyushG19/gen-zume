@@ -9,21 +9,35 @@ export async function upsertIntoSinglStrLeafField(
     update: "Resume",
     updates: [
       {
-        q: { telegramId },
+        q: {
+          telegramId,
+          [fieldName]: { $exists: false },
+        },
         u: {
-          $set: { [fieldName]: data, updatedAt: new Date() },
+          $set: {
+            [fieldName]: data,
+          },
           $setOnInsert: {
             telegramId,
-            createdAt: new Date(),
+          },
+          $currentDate: {
+            updatedAt: true,
+            createdAt: true,
           },
         },
-
         upsert: true,
       },
     ],
   });
+
   console.log(res);
 }
+
+// export async function upertIntoSingleStrLeafField(telegramId:string,fieldName:string,data:string) {
+//   const res = await prisma.resume.upsert({
+//     where: { telegramId },
+//     update:{}
+// }) }
 
 export async function deleteSingleStrLeafFieldData(
   telegramId: string,
@@ -34,7 +48,10 @@ export async function deleteSingleStrLeafFieldData(
     updates: [
       {
         q: { telegramId },
-        u: { $unset: { [fieldPath]: "" }, updatedAt: new Date() },
+        u: {
+          $unset: { [fieldPath]: "" },
+          $currentDate: { updatedAt: true },
+        },
       },
     ],
   });

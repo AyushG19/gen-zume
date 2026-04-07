@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Bot, session, webhookCallback } from "grammy";
+import { Bot, InlineKeyboard, session, webhookCallback } from "grammy";
 import {
   type ConversationFlavor,
   conversations,
@@ -23,6 +23,7 @@ import {
 import { DeleteConvo, MasterConvo } from "./conversations/master.js";
 import { getOrCreateResume } from "../prisma/index.js";
 import { createServer } from "http";
+import { fetchUrl } from "./utils/api.js";
 
 const token = process.env.TELEGRAM_BOT_KEY;
 export const bot = new Bot<ConversationFlavor<MyContext>>(token!); //change in futurte
@@ -35,6 +36,8 @@ bot.use(
       mode: null,
       selectedIndex: null,
       step: null,
+      _loading: false,
+      lastPdf: null,
     }),
   }),
 );
@@ -42,7 +45,7 @@ bot.use(
 bot.use(conversations());
 
 bot.use(async (ctx, next) => {
-  if (!ctx.from) return;
+  if (!ctx.from || ctx.session._loading) return;
   const telegramId = String(ctx.from.id);
 
   if (!ctx.session.telegramId) {
@@ -98,6 +101,44 @@ bot.on("message::bot_command", async (ctx) => {
       "🗑️ <b>Delete Resume Section</b>\nChoose what you want to delete:",
       { reply_markup: getFeildsKeyboard(), parse_mode: "HTML" },
     );
+  } else if (text == "/pdf") {
+    ctx.session._loading = true;
+    const message = await ctx.reply("Bringing right to you...");
+    const currTime = new Date().getTime();
+    if (
+      ctx.session.lastPdf &&
+      currTime - ctx.session.lastPdf < 1000 * 60 * 15
+    ) {
+      await ctx.api.editMessageText(
+        ctx.chat.id,
+        message.message_id,
+        "Too many inputs man, i am tired!!😫",
+      );
+      ctx.session._loading = false;
+      return;
+    }
+    if (!ctx.session.lastPdf) ctx.session.lastPdf = currTime;
+
+    const resume = await getOrCreateResume(ctx.session.telegramId!);
+    const pdfDownloadUrl = await fetchUrl(resume);
+
+    if (pdfDownloadUrl) {
+      const kb = new InlineKeyboard().url("CLick", pdfDownloadUrl);
+      await ctx.api.editMessageText(
+        ctx.chat.id,
+        message.message_id,
+        "Here is your pdf 👇",
+        { reply_markup: kb },
+      );
+    } else {
+      await ctx.api.editMessageText(
+        ctx.chat.id,
+        message.message_id,
+        "Sorry i forgot, Try again 😓!!",
+      );
+      ctx.session.lastPdf = null;
+    }
+    ctx.session._loading = false;
   }
 });
 

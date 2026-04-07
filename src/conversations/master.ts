@@ -81,7 +81,7 @@ export async function MasterConvo(
           selectedIndex - 1,
         );
       }
-      await ctx.reply(blueprint.success);
+      await ctx.reply(blueprint.success, { parse_mode: "HTML" });
     } else {
       const cleanData = SingleStringSchema.safeParse(data);
 
@@ -96,7 +96,7 @@ export async function MasterConvo(
         fieldPath,
         cleanData.data.input,
       );
-      await ctx.reply(blueprint.success);
+      await ctx.reply(blueprint.success, { parse_mode: "HTML" });
     }
   });
 }
@@ -144,6 +144,6 @@ export async function DeleteConvo(conversation: MyConversation, ctx: Context) {
       const fieldPath = getFieldPath(leafField);
       await deleteSingleStrLeafFieldData(telegramId, fieldPath);
     }
-    await ctx.reply("Delete successfull");
+    await ctx.reply("Delete successfull ✔️");
   });
 }

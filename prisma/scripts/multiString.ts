@@ -100,8 +100,8 @@ export async function updateIntoMultiStrLeafField(
         u: {
           $set: {
             [`${dbFieldName}.${index}`]: payload.data,
-            updatedAt: new Date(),
           },
+          $currentDate: { updatedAt: true },
         },
       },
     ] as unknown as InputJsonValue,
@@ -123,10 +123,8 @@ export async function deleteMultiStrLeafFieldData(
         u: {
           $pull: {
             [firstFieldName]: [firstFieldValue],
-            $set: {
-              updatedAt: new Date(),
-            },
           },
+          $currentDate: { updatedAt: true },
         },
       },
     ],

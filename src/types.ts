@@ -84,6 +84,8 @@ export const SessionData = z.object({
     .union([HeaderSubFeilds, LinksSubfeild, SkillsSubFeilds, LeafFieldInFields])
     .nullable(),
   selectedIndex: z.number().nullable(),
+  _loading: z.boolean().default(false),
+  lastPdf: z.number().nullable(),
 });
 
 export const ResumeSchema = z.object({

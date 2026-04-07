@@ -20,5 +20,4 @@ logs/
 
 generated/
 
-
-
+/src/tests/*
